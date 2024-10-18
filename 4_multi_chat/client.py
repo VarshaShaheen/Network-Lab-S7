@@ -1,33 +1,27 @@
 import socket
 import threading
 
+host = socket.gethostname()
+port = 5004
 
-def receive_message(sock):
+
+def send_message(client_socket):
     while True:
-        try:
-            message = sock.recv(1024).decode()
-            print(message)
-        except:
-            print("You have been disconnected from the server.")
-            sock.close()
-            break
+        message = input("Enter the message to send: ")
+        if message:
+            client_socket.sendto(message.encode(), (host,port))
 
 
-def send_message(sock):
+def receive_message(cl_socket):
     while True:
-        message = input('')
-        sock.send(message.encode())
-
-
-def main():
-    host = '127.0.0.1'
-    port = 11112
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((host, port))
-
-    threading.Thread(target=receive_message, args=(client_socket,)).start()
-    threading.Thread(target=send_message, args=(client_socket,)).start()
+        message = cl_socket.recv(1024).decode()
+        if message:
+            print("Received from server: ", message)
 
 
 if __name__ == '__main__':
-    main()
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((host,port))
+
+    send_thread = threading.Thread(target=send_message, args=(client_socket,)).start()
+    receive_thread = threading.Thread(target=receive_message, args=(client_socket, )).start()
