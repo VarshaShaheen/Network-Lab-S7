@@ -2,15 +2,12 @@ import socket
 import threading
 
 
-def handle_client(conn, addr, clients):
+def handle_client(conn, addr):
     while True:
         try:
             message = conn.recv(1024).decode()
             if message:
                 print(f"Message from {addr}: {message}")
-                # Client messages are not broadcasted to other clients.
-            else:
-                remove(conn, clients)
         except:
             continue
 
@@ -18,29 +15,20 @@ def handle_client(conn, addr, clients):
 def broadcast(message, clients):
     """Broadcasts a message from the server to all connected clients."""
     for client in clients:
-        try:
-            client.send(message.encode())
-        except:
-            remove(client, clients)
-
-
-def remove(connection, clients):
-    """Remove a client from the list if connection is lost."""
-    if connection in clients:
-        clients.remove(connection)
+        client.send(message.encode())
 
 
 def server_message(clients):
     """Allows the server admin to input and broadcast messages."""
     while True:
         message = input("Server: ")
-        if message.strip():
+        if message:
             broadcast("Server: " + message, clients)
 
 
 def main():
     host = '127.0.0.1'
-    port = 12345
+    port = 5004
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen()
@@ -55,7 +43,7 @@ def main():
         clients.append(conn)
         print(f"Connected to {addr}")
         # Start a new thread for each client connection
-        threading.Thread(target=handle_client, args=(conn, addr, clients)).start()
+        threading.Thread(target=handle_client, args=(conn, addr)).start()
 
 
 if __name__ == '__main__':
