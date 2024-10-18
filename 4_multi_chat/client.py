@@ -1,25 +1,33 @@
-import socket,threading
+import socket
+import threading
 
-def rx():
+
+def receive_message(sock):
     while True:
-        message = client.recv(1024).decode()
-        print(message)
+        try:
+            message = sock.recv(1024).decode()
+            print(message)
+        except:
+            print("You have been disconnected from the server.")
+            sock.close()
+            break
 
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect((socket.gethostname(), 8200))
+def send_message(sock):
+    while True:
+        message = input('')
+        sock.send(message.encode())
 
-name = input("username: ")
-client.send(name.encode())
-print(client.recv(1024).decode())
 
-rx_thread = threading.Thread(target=rx)
-rx_thread.start()
+def main():
+    host = '127.0.0.1'
+    port = 12345
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((host, port))
 
-while True:
-    message = input("")
-    client.send(message.encode())
-    if message == "exit":
-        break
+    threading.Thread(target=receive_message, args=(client_socket,)).start()
+    threading.Thread(target=send_message, args=(client_socket,)).start()
 
-client.close()
+
+if __name__ == '__main__':
+    main()
