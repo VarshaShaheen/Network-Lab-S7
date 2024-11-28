@@ -1,5 +1,4 @@
 import socket
-import json
 
 host = socket.gethostname()
 port = 5000
@@ -14,6 +13,7 @@ def server_func():
     while True:
         data, addr = server_socket.recvfrom(1024)
         message = data.decode()
+        print(addr)
         print("Received message: ", message)
         message = message.upper()
         server_socket.sendto(message.encode(), addr)

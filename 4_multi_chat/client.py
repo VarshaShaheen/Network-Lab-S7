@@ -5,23 +5,23 @@ host = socket.gethostname()
 port = 5004
 
 
-def send_message(client_socket):
+def send_func(client_socket):
     while True:
-        message = input("Enter the message to send: ")
+        message = input("Enter a message: ")
         if message:
-            client_socket.sendto(message.encode(), (host,port))
+            client_socket.sendto(message.encode(), (host, port))
 
 
-def receive_message(cl_socket):
+def receive_func(client_socket):
     while True:
-        message = cl_socket.recv(1024).decode()
+        message, addr = client_socket.recvfrom(1024)
         if message:
-            print("Received from server: ", message)
+            print("received from server" + message.decode())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((host,port))
+    client_socket.connect((host, port))
 
-    send_thread = threading.Thread(target=send_message, args=(client_socket,)).start()
-    receive_thread = threading.Thread(target=receive_message, args=(client_socket, )).start()
+    send_thread = threading.Thread(target=send_func, args=(client_socket,)).start()
+    receive_thread = threading.Thread(target=receive_func, args=(client_socket,)).start()

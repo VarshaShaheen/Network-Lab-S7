@@ -48,4 +48,3 @@ if __name__ == '__main__':
     print("The result with error is: ", error_data)
     client_sock.sendto(f'{error_data},{key}'.encode(), (host, port))
     client_sock.close()
-
